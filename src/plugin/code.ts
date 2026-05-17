@@ -1,7 +1,7 @@
 import { applyFont } from './apply-font';
 import type { FontApplyRequest } from '../types';
 
-figma.showUI(__html__, { width: 280, height: 112 });
+figma.showUI(__html__, { width: 280, height: 96 });
 
 figma.ui.onmessage = (message: unknown) => {
   const request = message as FontApplyRequest | undefined;
