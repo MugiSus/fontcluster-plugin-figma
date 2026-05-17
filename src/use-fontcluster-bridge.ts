@@ -2,10 +2,9 @@ import { createEffect, createSignal, onCleanup } from 'solid-js';
 import type { Accessor } from 'solid-js';
 
 import type {
-  FontApplyRequest,
   FontApplyResult,
-  FontclusterFontPayload,
   FontclusterBridgeState,
+  FontclusterFontPayload,
 } from './types';
 
 const BRIDGE_URL = 'http://localhost:38653/latest';
@@ -19,10 +18,6 @@ export interface FontclusterBridge {
   font: Accessor<FontclusterFontPayload | null>;
 }
 
-function postPluginMessage(message: FontApplyRequest) {
-  parent.postMessage({ pluginMessage: message }, '*');
-}
-
 export function useFontclusterBridge(): FontclusterBridge {
   const [isConnected, setIsConnected] = createSignal(false);
   const [isReceived, setIsReceived] = createSignal(false);
@@ -30,7 +25,7 @@ export function useFontclusterBridge(): FontclusterBridge {
   const [isApplied, setIsApplied] = createSignal(false);
   const [hasError, setHasError] = createSignal(false);
   const [font, setFont] = createSignal<FontclusterFontPayload | null>(null);
-  const [lastSequence, setLastSequence] = createSignal(0);
+  const [sequence, setSequence] = createSignal(0);
 
   createEffect(() => {
     let disposed = false;
@@ -41,44 +36,50 @@ export function useFontclusterBridge(): FontclusterBridge {
 
         if (!response.ok) {
           setIsConnected(false);
-          setHasError(true);
           setIsApplying(false);
+          setHasError(true);
           return;
         }
 
         const bridgeState = (await response.json()) as FontclusterBridgeState;
         setIsConnected(true);
 
-        if (!bridgeState.font || bridgeState.sequence <= lastSequence()) {
+        if (!bridgeState.font || bridgeState.sequence <= sequence()) {
           return;
         }
 
-        setLastSequence(bridgeState.sequence);
+        setSequence(bridgeState.sequence);
+        setFont(bridgeState.font);
         setIsReceived(true);
         setIsApplying(true);
         setIsApplied(false);
         setHasError(false);
-        setFont(bridgeState.font);
-        postPluginMessage({
-          type: 'apply-font',
-          payload: bridgeState.font,
-          sequence: bridgeState.sequence,
-        });
+
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: 'apply-font',
+              payload: bridgeState.font,
+              sequence: bridgeState.sequence,
+            },
+          },
+          '*',
+        );
       } catch {
         setIsConnected(false);
-        setHasError(true);
         setIsApplying(false);
+        setHasError(true);
       }
     }
 
     function handleMessage(event: MessageEvent) {
       const message = event.data?.pluginMessage as FontApplyResult | undefined;
 
-      if (!message || message.type !== 'apply-result') {
-        return;
-      }
-
-      if (message.sequence !== lastSequence()) {
+      if (
+        !message ||
+        message.type !== 'apply-result' ||
+        message.sequence !== sequence()
+      ) {
         return;
       }
 

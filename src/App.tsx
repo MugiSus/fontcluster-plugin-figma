@@ -15,15 +15,21 @@ const App: Component = () => {
           when={isConnected()}
           fallback="Start Fontcluster, then click an item on the List."
         >
-          <Show when={isReceived() && font()} fallback="Waiting for Fontcluster...">
-            <Show when={isApplying()}>
-              Applying {font()?.fontName}...
-            </Show>
-            <Show when={isApplied()}>
-              Applied {font()?.fontName}
-            </Show>
-            <Show when={hasError()}>
-              Font not available: {font()?.familyName}
+          <Show when={isReceived()} fallback="Waiting for Fontcluster...">
+            <Show when={font()}>
+              {(font) => (
+                <>
+                  <Show when={isApplying()}>
+                    Applying {font().fontName}...
+                  </Show>
+                  <Show when={isApplied()}>
+                    Applied {font().fontName}
+                  </Show>
+                  <Show when={hasError()}>
+                    Font not available: {font().familyName}
+                  </Show>
+                </>
+              )}
             </Show>
           </Show>
         </Show>
