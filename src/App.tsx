@@ -12,8 +12,8 @@ const App: Component = () => {
       <Show
         when={isConnected()}
         fallback={
-          <div class='size-full flex flex-col items-center justify-center gap-0.5'>
-            <p>No FontCluster connection detected.</p>
+          <div class='size-full flex flex-col items-center justify-center'>
+            <p class='mt-1.5'>No FontCluster App detected.</p>
             <a href='https://fontcluster.mugisus.me/' class='underline text-sky-600' target='_blank' rel='noopener noreferrer'>
               What's FontCluster?
             </a>
