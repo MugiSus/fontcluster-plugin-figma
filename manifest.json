@@ -1,6 +1,6 @@
 {
   "name": "FontCluster Apply",
-  "id": "fontcluster-apply-figma-plugin",
+  "id": "1637936965422808307",
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/index.html",

@@ -8,19 +8,19 @@ const App: Component = () => {
     useFontclusterBridge();
 
   return (
-    <main class="p-4 text-xs size-full text-gray-500" role="status" aria-live="polite">
+    <main class="text-xs size-full text-gray-500" role="status" aria-live="polite">
       <Show
         when={isConnected()}
         fallback={
           <div class='size-full flex flex-col items-center justify-center'>
-            <p class='mt-1.5'>No FontCluster App detected.</p>
+            <p>No FontCluster App detected.</p>
             <a href='https://fontcluster.mugisus.me/' class='underline text-sky-600' target='_blank' rel='noopener noreferrer'>
               What's FontCluster?
             </a>
           </div>
         }
       >
-        <div class="font-semibold text-neutral-900 mb-1">Fontcluster</div>
+        <div class="font-semibold text-neutral-900 mb-1 p-4">Fontcluster</div>
         <Show when={font()} fallback="Click an item on the List panel.">
           {(font) => (
             <>
