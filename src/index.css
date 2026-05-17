@@ -1,0 +1,29 @@
+@import 'tailwindcss';
+
+body {
+  box-sizing: border-box;
+  margin: 0;
+  color: #1f1f1f;
+  font:
+    12px/1.45 Inter,
+    sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+.plugin-shell {
+  padding: 14px;
+}
+
+.title {
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.status {
+  color: #666;
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Fontcluster Apply",
+  "id": "fontcluster-apply-figma-plugin",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/index.html",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": ["http://localhost:38653"],
+    "reasoning": "Reads the selected Fontcluster font from the local Fontcluster desktop app bridge."
+  }
+}
