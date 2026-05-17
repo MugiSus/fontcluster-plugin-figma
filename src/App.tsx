@@ -9,7 +9,7 @@ const App: Component = () => {
 
   return (
     <main class="p-4 text-xs text-neutral-900">
-      <div class="mb-1.5 font-semibold">Fontcluster</div>
+      <div class="mb-1.5 font-semibold">FontCluster</div>
       <div class="text-gray-500" role="status" aria-live="polite">
         <Show
           when={isConnected()}
