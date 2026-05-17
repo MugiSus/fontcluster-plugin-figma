@@ -4,6 +4,8 @@ import solidPlugin from 'vite-plugin-solid';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
+const FIGMA_RUNTIME_TARGET = 'es2019';
+
 function figmaPluginBuild() {
   return {
     name: 'figma-plugin-build',
@@ -42,7 +44,7 @@ export default defineConfig(({ mode }) => {
   if (mode === 'plugin') {
     return {
       build: {
-        target: 'esnext',
+        target: FIGMA_RUNTIME_TARGET,
         outDir: 'dist',
         emptyOutDir: false,
         lib: {
@@ -62,7 +64,7 @@ export default defineConfig(({ mode }) => {
       port: 3000,
     },
     build: {
-      target: 'esnext',
+      target: FIGMA_RUNTIME_TARGET,
       rollupOptions: {
         input: resolve(process.cwd(), 'index.html'),
         output: {

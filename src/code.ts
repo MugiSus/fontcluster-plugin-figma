@@ -1,52 +1,5 @@
 import { createTextCharacters, findMatchingFontName } from './lib';
-import type {
-  ApplyFontMessage,
-  FontclusterFontPayload,
-  PluginMessage,
-} from './types';
-
-type FontName = {
-  family: string;
-  style: string;
-};
-
-type AvailableFont = {
-  fontName: FontName;
-};
-
-type TextNode = {
-  type: 'TEXT';
-  parent: unknown;
-  x: number;
-  y: number;
-  fontName: FontName;
-  fontSize: number;
-  characters: string;
-};
-
-type SceneNode = TextNode | { type: string };
-
-declare const __html__: string;
-declare const figma: {
-  showUI(html: string, options: { width: number; height: number }): void;
-  listAvailableFontsAsync(): Promise<AvailableFont[]>;
-  loadFontAsync(fontName: FontName): Promise<void>;
-  createText(): TextNode;
-  currentPage: {
-    selection: SceneNode[];
-    appendChild(node: TextNode): void;
-  };
-  viewport: {
-    center: { x: number; y: number };
-    scrollAndZoomIntoView(nodes: TextNode[]): void;
-  };
-  ui: {
-    onmessage: ((message: unknown) => void) | undefined;
-    postMessage(message: PluginMessage): void;
-  };
-  notify(message: string): void;
-  commitUndo(): void;
-};
+import type { FontApplyRequest, FontclusterFontPayload } from './types';
 
 figma.showUI(__html__, { width: 280, height: 112 });
 
@@ -54,8 +7,8 @@ function isTextNode(node: SceneNode): node is TextNode {
   return node.type === 'TEXT';
 }
 
-function parseApplyFontMessage(message: unknown): ApplyFontMessage | null {
-  const applyMessage = message as ApplyFontMessage | undefined;
+function parseApplyFontMessage(message: unknown): FontApplyRequest | null {
+  const applyMessage = message as FontApplyRequest | undefined;
 
   if (!applyMessage || applyMessage.type !== 'apply-font') {
     return null;
@@ -67,7 +20,7 @@ function parseApplyFontMessage(message: unknown): ApplyFontMessage | null {
 async function applyFont(
   payload: FontclusterFontPayload,
   sequence: number,
-): Promise<void> {
+) {
   const availableFonts = await figma.listAvailableFontsAsync();
   const selectedTextNodes = figma.currentPage.selection.filter(isTextNode);
   const fontName = findMatchingFontName(
@@ -81,7 +34,6 @@ async function applyFont(
       type: 'apply-result',
       sequence,
       ok: false,
-      message: `Font not available: ${payload.familyName}`,
     });
     return;
   }
@@ -119,7 +71,6 @@ async function applyFont(
     type: 'apply-result',
     sequence,
     ok: true,
-    message: resultMessage,
   });
 }
 
@@ -138,7 +89,6 @@ figma.ui.onmessage = (message: unknown) => {
         type: 'apply-result',
         sequence: applyMessage.sequence,
         ok: false,
-        message: String(error),
       });
     },
   );

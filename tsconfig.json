@@ -15,7 +15,8 @@
 
     // Type Checking & Safety
     "strict": true,
-    "types": ["vite/client"]
+    "skipLibCheck": true,
+    "types": ["vite/client", "@figma/plugin-typings"]
   },
   "include": ["src"]
 }

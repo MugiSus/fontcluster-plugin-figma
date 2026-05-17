@@ -19,17 +19,14 @@ export interface FontclusterBridgeState {
   font?: FontclusterFontPayload | null;
 }
 
-export interface ApplyFontMessage {
+export interface FontApplyRequest {
   type: 'apply-font';
   payload: FontclusterFontPayload;
   sequence: number;
 }
 
-export interface ApplyResultMessage {
+export interface FontApplyResult {
   type: 'apply-result';
   sequence: number;
   ok: boolean;
-  message: string;
 }
-
-export type PluginMessage = ApplyFontMessage | ApplyResultMessage;
