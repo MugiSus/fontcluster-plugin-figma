@@ -8,7 +8,7 @@ const App: Component = () => {
     useFontclusterBridge();
 
   return (
-    <main class="text-xs size-full text-gray-500" role="status" aria-live="polite">
+    <main class="text-xs size-full text-gray-500 p-4" role="status" aria-live="polite">
       <Show
         when={isConnected()}
         fallback={
@@ -20,7 +20,7 @@ const App: Component = () => {
           </div>
         }
       >
-        <div class="font-semibold text-neutral-900 mb-1 p-4">Fontcluster</div>
+        <div class="font-semibold text-neutral-900 mb-1">Fontcluster</div>
         <Show when={font()} fallback="Click an item on the List panel.">
           {(font) => (
             <>
