@@ -13,9 +13,9 @@ applies the font there.
 4. Run `Fontcluster Apply`.
 5. Click a FontItem in Fontcluster.
 
-The plugin polls the local Fontcluster bridge at `http://localhost:38653/latest`
+The plugin polls the local Fontcluster bridge at `http://localhost:38653/data`
 while it is open.
 
 `src/App.tsx` contains the Solid UI bridge polling implementation.
-`src/code.ts` contains the Figma main-thread implementation.
+`src/plugin/code.ts` contains the Figma main-thread implementation.
 `src/types.ts` contains the message and payload schema.

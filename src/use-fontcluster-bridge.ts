@@ -3,11 +3,11 @@ import type { Accessor } from 'solid-js';
 
 import type {
   FontApplyResult,
-  FontclusterBridgeState,
-  FontclusterFontPayload,
+  FontclusterBridgeData,
+  FontclusterFontMetadata,
 } from './types';
 
-const BRIDGE_URL = 'http://localhost:38653/latest';
+const BRIDGE_DATA_URL = 'http://localhost:38653/data';
 
 export interface FontclusterBridge {
   isConnected: Accessor<boolean>;
@@ -15,7 +15,7 @@ export interface FontclusterBridge {
   isApplying: Accessor<boolean>;
   isApplied: Accessor<boolean>;
   hasError: Accessor<boolean>;
-  font: Accessor<FontclusterFontPayload | null>;
+  font: Accessor<FontclusterFontMetadata | null>;
 }
 
 export function useFontclusterBridge(): FontclusterBridge {
@@ -24,15 +24,15 @@ export function useFontclusterBridge(): FontclusterBridge {
   const [isApplying, setIsApplying] = createSignal(false);
   const [isApplied, setIsApplied] = createSignal(false);
   const [hasError, setHasError] = createSignal(false);
-  const [font, setFont] = createSignal<FontclusterFontPayload | null>(null);
-  const [sequence, setSequence] = createSignal(0);
+  const [font, setFont] = createSignal<FontclusterFontMetadata | null>(null);
+  const [modifiedDate, setModifiedDate] = createSignal<string | null>(null);
 
   createEffect(() => {
     let disposed = false;
 
     async function pollBridge() {
       try {
-        const response = await fetch(BRIDGE_URL, { cache: 'no-store' });
+        const response = await fetch(BRIDGE_DATA_URL, { cache: 'no-store' });
 
         if (!response.ok) {
           setIsConnected(false);
@@ -41,14 +41,18 @@ export function useFontclusterBridge(): FontclusterBridge {
           return;
         }
 
-        const bridgeState = (await response.json()) as FontclusterBridgeState;
+        const bridgeState = (await response.json()) as FontclusterBridgeData;
         setIsConnected(true);
 
-        if (!bridgeState.font || bridgeState.sequence <= sequence()) {
+        if (
+          !bridgeState.font ||
+          !bridgeState.modified_date ||
+          bridgeState.modified_date === modifiedDate()
+        ) {
           return;
         }
 
-        setSequence(bridgeState.sequence);
+        setModifiedDate(bridgeState.modified_date);
         setFont(bridgeState.font);
         setIsReceived(true);
         setIsApplying(true);
@@ -60,7 +64,8 @@ export function useFontclusterBridge(): FontclusterBridge {
             pluginMessage: {
               type: 'apply-font',
               payload: bridgeState.font,
-              sequence: bridgeState.sequence,
+              session: bridgeState.session ?? null,
+              modified_date: bridgeState.modified_date,
             },
           },
           '*',
@@ -78,7 +83,7 @@ export function useFontclusterBridge(): FontclusterBridge {
       if (
         !message ||
         message.type !== 'apply-result' ||
-        message.sequence !== sequence()
+        message.modified_date !== modifiedDate()
       ) {
         return;
       }

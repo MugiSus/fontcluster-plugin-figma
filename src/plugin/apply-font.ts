@@ -1,23 +1,27 @@
-import type { FontclusterFontPayload } from '../types';
+import type {
+  FontclusterFontMetadata,
+  FontclusterSessionConfig,
+} from '../types';
 
 export async function applyFont(
-  payload: FontclusterFontPayload,
-  sequence: number,
+  payload: FontclusterFontMetadata,
+  session: FontclusterSessionConfig | null,
+  modifiedDate: string,
 ) {
   const availableFonts = await figma.listAvailableFontsAsync();
   const selectedTextNodes = figma.currentPage.selection.filter(
     (node): node is TextNode => node.type === 'TEXT',
   );
   const familyCandidates = new Set([
-    payload.familyName,
-    payload.fontName,
-    ...Object.values(payload.preferredFamilyNames),
-    ...Object.values(payload.familyNames),
+    payload.family_name,
+    payload.font_name,
+    ...Object.values(payload.preferred_family_names),
+    ...Object.values(payload.family_names),
   ]);
   const styleCandidates = new Set([
-    payload.styleName,
-    ...Object.values(payload.preferredStyleNames),
-    ...Object.values(payload.styleNames),
+    payload.style_name,
+    ...Object.values(payload.preferred_style_names),
+    ...Object.values(payload.style_names),
   ]);
   const fontName =
     availableFonts
@@ -29,10 +33,10 @@ export async function applyFont(
       ) ?? null;
 
   if (!fontName) {
-    figma.notify(`Font not available in Figma: ${payload.familyName}`);
+    figma.notify(`Font not available in Figma: ${payload.family_name}`);
     figma.ui.postMessage({
       type: 'apply-result',
-      sequence,
+      modified_date: modifiedDate,
       ok: false,
     });
     return;
@@ -58,7 +62,9 @@ export async function applyFont(
     if (node === createdTextNode) {
       node.fontSize = 16;
       node.characters =
-        payload.previewText.trim() || payload.fontName || payload.familyName;
+        session?.preview_text.trim() ||
+        payload.font_name ||
+        payload.family_name;
     }
   }
 
@@ -70,7 +76,7 @@ export async function applyFont(
   figma.notify(resultMessage);
   figma.ui.postMessage({
     type: 'apply-result',
-    sequence,
+    modified_date: modifiedDate,
     ok: true,
   });
 }

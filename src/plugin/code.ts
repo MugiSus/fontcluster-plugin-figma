@@ -8,13 +8,17 @@ figma.ui.onmessage = (message: unknown) => {
 
   if (!request || request.type !== 'apply-font') return;
 
-  applyFont(request.payload, request.sequence).catch((error: unknown) => {
-    console.error(error);
-    figma.notify(`Failed to apply ${request.payload.fontName}`, { error: true });
-    figma.ui.postMessage({
-      type: 'apply-result',
-      sequence: request.sequence,
-      ok: false,
-    });
-  });
+  applyFont(request.payload, request.session, request.modified_date).catch(
+    (error: unknown) => {
+      console.error(error);
+      figma.notify(`Failed to apply ${request.payload.font_name}`, {
+        error: true,
+      });
+      figma.ui.postMessage({
+        type: 'apply-result',
+        modified_date: request.modified_date,
+        ok: false,
+      });
+    },
+  );
 };

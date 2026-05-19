@@ -25,13 +25,13 @@ const App: Component = () => {
           {(font) => (
             <>
               <Show when={isApplying()}>
-                Applying {font().fontName}...
+                Applying {font().font_name}...
               </Show>
               <Show when={isApplied()}>
-                Applied {font().fontName}
+                Applied {font().font_name}
               </Show>
               <Show when={hasError()}>
-                Font not available: {font().familyName}
+                Font not available: {font().family_name}
               </Show>
             </>
           )}
