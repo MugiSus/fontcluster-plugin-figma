@@ -7,7 +7,7 @@ applies the font there.
 ## Development
 
 1. Start Fontcluster.
-2. Download `fontcluster-apply-figma.zip` and extract
+2. Download `fontcluster-apply-figma.zip` and extract.
 3. In Figma Desktop, import `manifest.json`:
    `Plugins > Development > Import plugin from manifest...`
 4. Run `Fontcluster Apply`.
