@@ -7,15 +7,11 @@ applies the font there.
 ## Development
 
 1. Start Fontcluster.
-2. Run `pnpm build`.
+2. Download `fontcluster-apply-figma.zip` and extract
 3. In Figma Desktop, import `manifest.json`:
    `Plugins > Development > Import plugin from manifest...`
 4. Run `Fontcluster Apply`.
-5. Click a FontItem in Fontcluster.
+5. Open 'List' panel and click an item in Fontcluster.
 
 The plugin polls the local Fontcluster bridge at `http://localhost:38653/data`
 while it is open.
-
-`src/App.tsx` contains the Solid UI bridge polling implementation.
-`src/plugin/code.ts` contains the Figma main-thread implementation.
-`src/types.ts` contains the message and payload schema.
