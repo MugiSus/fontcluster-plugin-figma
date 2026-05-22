@@ -11,6 +11,9 @@ importers:
       solid-js:
         specifier: ^1.9.9
         version: 1.9.9
+      uuid:
+        specifier: ^14.0.0
+        version: 14.0.0
     devDependencies:
       '@figma/plugin-typings':
         specifier: ^1.126.0
@@ -903,6 +906,10 @@ packages:
     peerDependencies:
       browserslist: '>= 4.21.0'
 
+  uuid@14.0.0:
+    resolution: {integrity: sha512-Qo+uWgilfSmAhXCMav1uYFynlQO7fMFiMVZsQqZRMIXp0O7rR7qjkj+cPvBHLgBqi960QCoo/PH2/6ZtVqKvrg==}
+    hasBin: true
+
   validate-html-nesting@1.2.3:
     resolution: {integrity: sha512-kdkWdCl6eCeLlRShJKbjVOU2kFKxMF8Ghu50n+crEoyx+VKm3FxAxF9z4DCy6+bbTOqNW0+jcIYRnjoIRzigRw==}
 
@@ -1763,6 +1770,8 @@ snapshots:
       browserslist: 4.25.4
       escalade: 3.2.0
       picocolors: 1.1.1
+
+  uuid@14.0.0: {}
 
   validate-html-nesting@1.2.3: {}
 

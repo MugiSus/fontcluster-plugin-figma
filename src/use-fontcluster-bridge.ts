@@ -1,5 +1,6 @@
 import { createEffect, createSignal, onCleanup } from 'solid-js';
 import type { Accessor } from 'solid-js';
+import { v7 as uuidv7 } from 'uuid';
 
 import type {
   FontApplyResult,
@@ -8,6 +9,8 @@ import type {
 } from './types';
 
 const BRIDGE_DATA_URL = 'http://localhost:38653/data';
+const BRIDGE_HEARTBEAT_URL = 'http://localhost:38653/heartbeat';
+const HEARTBEAT_INTERVAL_MS = 1000;
 
 export interface FontclusterBridge {
   isConnected: Accessor<boolean>;
@@ -26,6 +29,8 @@ export function useFontclusterBridge(): FontclusterBridge {
   const [hasError, setHasError] = createSignal(false);
   const [font, setFont] = createSignal<FontclusterFontMetadata | null>(null);
   const [modifiedDate, setModifiedDate] = createSignal<string | null>(null);
+  const [documentName, setDocumentName] = createSignal<string | null>(null);
+  const pluginId = uuidv7();
 
   createEffect(() => {
     let disposed = false;
@@ -77,8 +82,33 @@ export function useFontclusterBridge(): FontclusterBridge {
       }
     }
 
+    async function sendHeartbeat() {
+      try {
+        await fetch(BRIDGE_HEARTBEAT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            plugin_id: pluginId,
+            plugin_name: 'Fontcluster Apply',
+            host: 'figma',
+            document_name: documentName(),
+          }),
+        });
+      } catch {
+        return;
+      }
+    }
+
     function handleMessage(event: MessageEvent) {
-      const message = event.data?.pluginMessage as FontApplyResult | undefined;
+      const message = event.data?.pluginMessage as
+        | FontApplyResult
+        | { type: 'plugin-metadata'; document_name?: string }
+        | undefined;
+
+      if (message?.type === 'plugin-metadata') {
+        setDocumentName(message.document_name || null);
+        return;
+      }
 
       if (
         !message ||
@@ -94,17 +124,28 @@ export function useFontclusterBridge(): FontclusterBridge {
     }
 
     window.addEventListener('message', handleMessage);
+    parent.postMessage(
+      { pluginMessage: { type: 'get-plugin-metadata' } },
+      '*',
+    );
     pollBridge();
+    void sendHeartbeat();
 
     const intervalId = window.setInterval(() => {
       if (!disposed) {
         pollBridge();
       }
     }, 500);
+    const heartbeatIntervalId = window.setInterval(() => {
+      if (!disposed) {
+        void sendHeartbeat();
+      }
+    }, HEARTBEAT_INTERVAL_MS);
 
     onCleanup(() => {
       disposed = true;
       window.clearInterval(intervalId);
+      window.clearInterval(heartbeatIntervalId);
       window.removeEventListener('message', handleMessage);
     });
   });

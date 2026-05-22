@@ -4,8 +4,15 @@ import type { FontApplyRequest } from '../types';
 figma.showUI(__html__, { width: 280, height: 96 });
 
 figma.ui.onmessage = (message: unknown) => {
-  const request = message as FontApplyRequest | undefined;
+  if ((message as { type?: string } | undefined)?.type === 'get-plugin-metadata') {
+    figma.ui.postMessage({
+      type: 'plugin-metadata',
+      document_name: figma.root.name,
+    });
+    return;
+  }
 
+  const request = message as FontApplyRequest | undefined;
   if (!request || request.type !== 'apply-font') return;
 
   applyFont(request.payload, request.session, request.modified_date).catch(
