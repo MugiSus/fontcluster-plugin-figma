@@ -20,7 +20,7 @@ const App: Component = () => {
           </div>
         }
       >
-        <div class="font-semibold text-neutral-900 mb-1">Fontcluster</div>
+        <div class="font-semibold text-neutral-900 mb-1">FontCluster</div>
         <Show when={font()} fallback="Click an item on the List panel.">
           {(font) => (
             <>
