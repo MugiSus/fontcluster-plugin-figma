@@ -4,7 +4,9 @@ import { viteSingleFile } from 'vite-plugin-singlefile';
 import solidPlugin from 'vite-plugin-solid';
 import { resolve } from 'node:path';
 
-const FIGMA_RUNTIME_TARGET = 'es2019';
+// Figma statically parses plugin code with an ES2018-level parser, so the
+// build must not emit ES2019+ syntax (e.g. optional catch binding `catch {}`).
+const FIGMA_RUNTIME_TARGET = 'es2018';
 
 export default defineConfig(({ mode }) => {
   if (mode === 'plugin') {

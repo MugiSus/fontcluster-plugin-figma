@@ -69,7 +69,7 @@ export function useFontclusterBridge(): FontclusterBridge {
             pluginMessage: {
               type: 'apply-font',
               payload: bridgeState.font,
-              session: bridgeState.session ?? null,
+              list_preview_text: bridgeState.list_preview_text ?? null,
               modified_date: bridgeState.modified_date,
             },
           },

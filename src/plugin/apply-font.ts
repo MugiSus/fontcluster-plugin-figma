@@ -1,11 +1,8 @@
-import type {
-  FontclusterFontMetadata,
-  FontclusterSessionConfig,
-} from '../types';
+import type { FontclusterFontMetadata } from '../types';
 
 export async function applyFont(
   payload: FontclusterFontMetadata,
-  session: FontclusterSessionConfig | null,
+  listPreviewText: string | null,
   modifiedDate: string,
 ) {
   const availableFonts = await figma.listAvailableFontsAsync();
@@ -42,30 +39,59 @@ export async function applyFont(
     return;
   }
 
-  let createdTextNode: TextNode | null = null;
-  const targets =
-    selectedTextNodes.length > 0
-      ? selectedTextNodes
-      : [(createdTextNode = figma.createText())];
+  // A freshly created text node carries Figma's default font; that font must be
+  // loaded before we can write any text property to it (including fontName).
+  // Create it up front so its default font is part of the same load step.
+  const createdNode = selectedTextNodes.length > 0 ? null : figma.createText();
 
-  await figma.loadFontAsync(fontName);
+  // Load every font we are about to touch *before* mutating any node. Loading
+  // up front lets a load failure bail out cleanly (removing the stray node) and
+  // avoids "unloaded font" errors when restyling existing or new nodes.
+  try {
+    await Promise.all([
+      figma.loadFontAsync(fontName),
+      ...(createdNode
+        ? [figma.loadFontAsync(createdNode.fontName as FontName)]
+        : []),
+      ...selectedTextNodes.flatMap((node) => {
+        const currentFonts =
+          node.fontName === figma.mixed
+            ? node.getRangeAllFontNames(0, node.characters.length)
+            : [node.fontName];
+        return currentFonts.map((font) => figma.loadFontAsync(font));
+      }),
+    ]);
+  } catch (error) {
+    console.error(error);
+    createdNode?.remove();
+    figma.notify(`Failed to load ${fontName.family} ${fontName.style}`, {
+      error: true,
+    });
+    figma.ui.postMessage({
+      type: 'apply-result',
+      modified_date: modifiedDate,
+      ok: false,
+    });
+    return;
+  }
 
-  for (const node of targets) {
-    if (!node.parent) {
-      figma.currentPage.appendChild(node);
-      node.x = figma.viewport.center.x;
-      node.y = figma.viewport.center.y;
+  let targets: TextNode[];
+  if (createdNode) {
+    createdNode.fontName = fontName;
+    createdNode.fontSize = 16;
+    createdNode.characters =
+      listPreviewText?.trim() ||
+      payload.sample_text?.trim() ||
+      payload.font_name ||
+      payload.family_name;
+    createdNode.x = figma.viewport.center.x;
+    createdNode.y = figma.viewport.center.y;
+    targets = [createdNode];
+  } else {
+    for (const node of selectedTextNodes) {
+      node.fontName = fontName;
     }
-
-    node.fontName = fontName;
-
-    if (node === createdTextNode) {
-      node.fontSize = 16;
-      node.characters =
-        session?.preview_text.trim() ||
-        payload.font_name ||
-        payload.family_name;
-    }
+    targets = selectedTextNodes;
   }
 
   const resultMessage = `Applied ${fontName.family} ${fontName.style}`;

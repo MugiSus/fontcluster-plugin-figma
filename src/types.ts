@@ -9,24 +9,21 @@ export interface FontclusterFontMetadata {
   preferred_style_names: Record<string, string>;
   publishers: Record<string, string>;
   designers: Record<string, string>;
+  sample_text?: string | null;
   weight: number;
   weights: string[];
 }
 
-export interface FontclusterSessionConfig {
-  preview_text: string;
-}
-
 export interface FontclusterBridgeData {
-  session?: FontclusterSessionConfig | null;
   font?: FontclusterFontMetadata | null;
   modified_date?: string | null;
+  list_preview_text?: string | null;
 }
 
 export interface FontApplyRequest {
   type: 'apply-font';
   payload: FontclusterFontMetadata;
-  session: FontclusterSessionConfig | null;
+  list_preview_text: string | null;
   modified_date: string;
 }
 

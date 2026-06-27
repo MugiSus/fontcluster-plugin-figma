@@ -15,7 +15,11 @@ figma.ui.onmessage = (message: unknown) => {
   const request = message as FontApplyRequest | undefined;
   if (!request || request.type !== 'apply-font') return;
 
-  applyFont(request.payload, request.session, request.modified_date).catch(
+  applyFont(
+    request.payload,
+    request.list_preview_text,
+    request.modified_date,
+  ).catch(
     (error: unknown) => {
       console.error(error);
       figma.notify(`Failed to apply ${request.payload.font_name}`, {
