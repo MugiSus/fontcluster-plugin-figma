@@ -18,7 +18,7 @@ figma.ui.onmessage = (message: unknown) => {
 
   applyFont(
     request.font,
-    request.list_preview_text,
+    request.preview_text,
     request.modified_date,
   ).catch(
     (error: unknown) => {

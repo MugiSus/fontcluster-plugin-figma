@@ -17,13 +17,13 @@ export interface FontclusterFontMetadata {
 export interface FontclusterBridgeData {
   font?: FontclusterFontMetadata | null;
   modified_date?: string | null;
-  list_preview_text?: string | null;
+  preview_text?: string | null;
 }
 
 export interface FontApplyRequest {
   type: 'apply-font';
   font: FontclusterFontMetadata;
-  list_preview_text: string | null;
+  preview_text: string | null;
   modified_date: string;
 }
 

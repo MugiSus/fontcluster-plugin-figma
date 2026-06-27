@@ -3,7 +3,7 @@ import type { FontclusterFontMetadata } from '../types';
 
 export async function applyFont(
   font: FontclusterFontMetadata,
-  listPreviewText: string | null,
+  previewText: string | null,
   modifiedDate: string,
 ) {
   const availableFonts = await figma.listAvailableFontsAsync();
@@ -80,11 +80,7 @@ export async function applyFont(
   if (createdNode) {
     createdNode.fontName = fontName;
     createdNode.fontSize = 16;
-    // The preview text comes from the bridge (the list preview field, or the
-    // session's rendering text when that field is empty). We never fall back to
-    // font-derived text like the family or sample name; if nothing is supplied,
-    // show the product name rather than an empty node.
-    createdNode.characters = listPreviewText?.trim() || 'FontCluster';
+    createdNode.characters = previewText ?? '';
     createdNode.x = figma.viewport.center.x;
     createdNode.y = figma.viewport.center.y;
     targets = [createdNode];
