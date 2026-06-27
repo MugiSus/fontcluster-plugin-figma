@@ -1,7 +1,8 @@
+import { notify } from './notify';
 import type { FontclusterFontMetadata } from '../types';
 
 export async function applyFont(
-  payload: FontclusterFontMetadata,
+  font: FontclusterFontMetadata,
   listPreviewText: string | null,
   modifiedDate: string,
 ) {
@@ -10,15 +11,15 @@ export async function applyFont(
     (node): node is TextNode => node.type === 'TEXT',
   );
   const familyCandidates = new Set([
-    payload.family_name,
-    payload.font_name,
-    ...Object.values(payload.preferred_family_names),
-    ...Object.values(payload.family_names),
+    font.family_name,
+    font.font_name,
+    ...Object.values(font.preferred_family_names),
+    ...Object.values(font.family_names),
   ]);
   const styleCandidates = new Set([
-    payload.style_name,
-    ...Object.values(payload.preferred_style_names),
-    ...Object.values(payload.style_names),
+    font.style_name,
+    ...Object.values(font.preferred_style_names),
+    ...Object.values(font.style_names),
   ]);
   const fontName =
     availableFonts
@@ -30,7 +31,7 @@ export async function applyFont(
       ) ?? null;
 
   if (!fontName) {
-    figma.notify(`Font not available in Figma: ${payload.family_name}`);
+    notify(`Font not available in Figma: ${font.family_name}`);
     figma.ui.postMessage({
       type: 'apply-result',
       modified_date: modifiedDate,
@@ -64,7 +65,7 @@ export async function applyFont(
   } catch (error) {
     console.error(error);
     createdNode?.remove();
-    figma.notify(`Failed to load ${fontName.family} ${fontName.style}`, {
+    notify(`Failed to load ${fontName.family} ${fontName.style}`, {
       error: true,
     });
     figma.ui.postMessage({
@@ -80,10 +81,7 @@ export async function applyFont(
     createdNode.fontName = fontName;
     createdNode.fontSize = 16;
     createdNode.characters =
-      listPreviewText?.trim() ||
-      payload.sample_text?.trim() ||
-      payload.font_name ||
-      payload.family_name;
+      listPreviewText?.trim() || font.sample_text?.trim() || '';
     createdNode.x = figma.viewport.center.x;
     createdNode.y = figma.viewport.center.y;
     targets = [createdNode];
@@ -99,7 +97,7 @@ export async function applyFont(
   figma.currentPage.selection = targets;
   figma.viewport.scrollAndZoomIntoView(targets);
   figma.commitUndo();
-  figma.notify(resultMessage);
+  notify(resultMessage);
   figma.ui.postMessage({
     type: 'apply-result',
     modified_date: modifiedDate,

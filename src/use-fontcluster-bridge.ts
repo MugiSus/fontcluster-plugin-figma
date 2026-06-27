@@ -68,7 +68,7 @@ export function useFontclusterBridge(): FontclusterBridge {
           {
             pluginMessage: {
               type: 'apply-font',
-              payload: bridgeState.font,
+              font: bridgeState.font,
               list_preview_text: bridgeState.list_preview_text ?? null,
               modified_date: bridgeState.modified_date,
             },

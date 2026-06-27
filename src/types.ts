@@ -22,7 +22,7 @@ export interface FontclusterBridgeData {
 
 export interface FontApplyRequest {
   type: 'apply-font';
-  payload: FontclusterFontMetadata;
+  font: FontclusterFontMetadata;
   list_preview_text: string | null;
   modified_date: string;
 }
